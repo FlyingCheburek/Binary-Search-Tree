@@ -35,6 +35,10 @@ namespace BSTree {
             tree.display_aux(tree.root, out);
             return out;
         }
+        friend Tree<T>& operator>>(Tree& tree, const T data) {
+            tree.insert(data);
+            return tree;
+        }
     };
 }
 #endif
