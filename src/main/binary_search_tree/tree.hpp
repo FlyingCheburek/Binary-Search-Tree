@@ -1,22 +1,26 @@
 #include "node.hpp"
 #include <iostream>
 #include <stdexcept>
+#include <set>
 #ifndef TREE_HPP
 #define TREE_HPP 
 namespace BSTree {
     template<typename T>
     class Tree final {
     private:
+        std::set<Node<T>*> memory; // for heap memory dealocation 
         Node<T>* root;
         Node<T>* insert_aux(Node<T>*& root, const T& data) noexcept {
             if (root == nullptr) {
                 root = new Node<T>(data);
+                memory.insert(root);
                 return root;
             }
             if (data < root->data)
                 root->left = insert_aux(root->left, data);
             else
                 root->right = insert_aux(root->right, data);
+            memory.insert(root);
             return root;
         }
         const Node<T>* search_aux(Node<T>* root, const T& data) const noexcept {
@@ -35,6 +39,10 @@ namespace BSTree {
     public:
         Tree() noexcept : root(nullptr) {}
         Tree(const T root_data) noexcept : root(new Node<T>(root_data)) {}
+        ~Tree() noexcept {
+            for (auto& addr : memory)
+                delete addr;
+        }
         inline bool empty() const noexcept { return root == nullptr; }
         inline void insert(const T data) { 
             if (search(data)) throw std::invalid_argument("Duplicate values are not allowed.");
